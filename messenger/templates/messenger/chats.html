@@ -1,0 +1,153 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block css %}
+<style>
+.messenger{
+    background-color: #4b4b4b;
+    width: 100%;
+    height: 100vh;
+    display: block;
+    color: white;
+    padding-top: 5%;
+}
+    .container{
+
+        border-radius: 3%;
+        display: flex;
+        width: 90%;
+        height: 90%;
+        background-color:#242424;
+        color: white;
+        border:solid;
+    }
+    .sidebar_chat{
+    margin: 2%;
+        width:40%;
+        min-height: 10%;
+
+    }
+    .sidebar_chat a{
+        text-decoration: none;
+        color: white;
+    }
+    .sidebar_chat ul{list-style-type: none; }
+    .mates{
+            margin: 2%;
+            overflow: auto;
+    width: 18%;
+    }
+    .mates a{
+        text-decoration: none;
+
+    }
+    .mate {
+    margin-bottom: 5%;
+    padding: 2%;
+    }
+    #mate_name{
+    padding: 2%;
+    margin: 2%;
+    display: flex;
+    }
+    .wall {
+    margin-top: 0px;
+    height: 100%;
+    width: 0.2%;
+    background-color: white;
+    }
+    .chat-window{
+        margin: 2%;
+        width: 40%;
+        overflow: auto;
+    }
+    .chat-input{
+        text-align: center;
+        bottom: 10%;
+        position: absolute;
+        width: 25%;
+    }
+    #message-container{
+        background-color: #242424;
+    }
+    .message{ background-color: white; }
+    #chat-chat{background-color: #242424; padding: 3%; width: 100%;word-break: break-all;}
+    #chat-chat{}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="messenger">
+<div class="container">
+    <div class="mates">
+        {% for user in users %}
+        {% if user != request.user %}
+        <div class="mate">
+            <div id="mate_name">
+            <img src="{% if user.user_image %} {{ user.user_image.url }} {% else %} {% static 'users/img/default_ava.jpg' %} {% endif %}" alt="" style="width: 30%; height: 30%; border-radius: 50%;"><h4>@{{ user.username }}</h4>
+        </div>    <a href="{% url 'messenger:create_chat' user.id %}"><button class="btn btn-success" >Start Chat</button></a>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    <div class="wall"></div>
+    <div class="sidebar_chat">
+        <h3>Chats</h3>
+        <ul>
+            {% for chat in chats %}
+                <li>
+                    <a href="{% url 'messenger:chat_combined' chat.id %}">
+                        <h3>
+                        {% if chat.user1 == request.user %}
+                            <img src="{% if chat.user2.user_image %} {{ chat.user2.user_image.url }} {% else %} {% static 'users/img/default_ava.jpg' %} {% endif %}" alt="" style="width: 20%; height: 20%; border-radius: 50%;">
+                            @{{ chat.user2.username }}
+                        {% else %}
+                            <img src="{% if chat.user1.user_image %} {{ chat.user1.user_image.url }} {% else %} {% static 'users/img/default_ava.jpg' %} {% endif %}" alt="" style="width: 20%; height: 20%; border-radius: 50%;">
+                            @{{ chat.user1.username }}
+                        {% endif %}</h3>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div class="wall"></div>
+    <div class="chat-window">
+        {% if selected_chat %}
+        <div class="chat-header">
+            <h4>
+                {% if selected_chat.user1 != request.user %}
+                <img src="{% if selected_chat.user1.user_image %} {{ selected_chat.user1.user_image.url }} {% else %} {% static 'users/img/default_ava.jpg' %} {% endif %}" alt="" style="width: 15%; height: 15%; border-radius: 50%;">
+                {{ selected_chat.user1.first_name }}
+                {% else %}
+                <img src="{% if selected_chat.user2.user_image %} {{ selected_chat.user2.user_image.url }} {% else %} {% static 'users/img/default_ava.jpg' %} {% endif %}" alt="" style="width: 15%; height: 15%; border-radius: 50%;">
+                {{ selected_chat.user2.first_name }}
+                {{ selected_chat.user2.last_name }}
+                {% endif %}</h4>
+
+        </div>
+        <div class="chat-messages" id="message-container">
+            {% for message in messages %}
+                <div class="message" id="chat-chat">
+                    <img src="{% if message.sender.user_image %} {{ message.sender.user_image.url }} {% else %} {% static 'users/img/default_ava.jpg' %} {% endif %}" alt="" style="width: 10%; height: 10%; border-radius: 50%; margin-right: 3%;">
+                    <h5 style="background-color: #b5a461; border-radius: 5%; padding: 3%;" >{{ message.content }}</h5>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="chat-input">
+
+            <form method="post" action="{% url 'messenger:send_message' selected_chat.id %}">
+                {% csrf_token %}
+                  <div class="form-group" style="display: flex; text-align: center; " >
+                      <input type="text" name="content" class="form-control" aria-describedby="emailHelp" placeholder="Send a message">
+                      <button type="submit" class="btn btn-warning" >Send</button>
+                  </div>
+            </form>
+        </div>
+        {% else %}
+        <div class="no-chat-selected">
+            <h2>Select a chat to start messaging</h2>
+        </div>
+        {% endif %}
+    </div>
+</div></div>
+{% endblock %}

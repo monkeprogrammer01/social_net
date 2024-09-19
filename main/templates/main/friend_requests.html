@@ -1,0 +1,60 @@
+{% extends 'main/base.html' %}
+{% load static %}
+{% block css %}
+<style>
+    .friends {
+        background-color: #242424;
+        width: 100%;
+        height: 100vh;
+        color: white;
+    }
+    .friends {
+    	color: black;
+        padding-top: 3%;
+    }
+    .friends a {
+    	color: black;
+        text-decoration: none;
+    }
+    .profile-image{
+		max-height: 100px;
+		max-width: 100px;
+	}
+	.profile-image{
+		border-radius: 12px;
+	}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="friends">
+<div class="container" >
+	<div class="card p-2" style="background-color: #242424;">
+		{% if friends %}
+			<div class="d-flex flex-row flex-wrap">
+				{% for friend in friends %}
+					{% if friend != request.user %}
+					<div class="card flex-row flex-grow-1 p-2 mx-2 my-2 align-items-center">
+					<a class="profile-link" href="">
+					<div class="card-image m-2"><img class="img-fluid profile-image" src="{% if friend.user_image %} {{ friend.user_image.url }} {% else %} {% static 'users/img/default_ava.jpg' %} {% endif %} " alt=""></div>
+					</a>
+					<a class="profile-link" href="">
+						<div class="card-center px-2"><h4 class="card-title">{{friend.username}}</h4><a href="{% url 'users:delete_friend' friend.pk %}"><button  class="btn btn-danger">Delete From Friends</button></a><a href="{% url 'messenger:create_chat' friend.id %}"><button class="btn btn-success" >Send a message</button></a></div>
+					</a>
+					</div>
+				{% if forloop.counter|divisibleby:2 %}
+			</div>
+			<div class="d-flex flex-row flex-wrap">
+				{% endif %}
+				{% endif %}
+				{% endfor %}
+				{% else %} <!-- If no friends -->
+				<div class="d-flex flex-row flex-grow-1 justify-content-center align-items-center p-4" >
+			<p style="color: white;" >No results</p>
+		</div>
+		{% endif %}
+		</div>
+	</div>
+</div>
+</div>
+{% endblock %}

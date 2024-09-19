@@ -1,0 +1,89 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block css %}
+<style>
+    .users {
+    	color: black;
+        padding-top: 3%;
+    }
+    .users a {
+    	color: black;
+        text-decoration: none;
+    }
+    	.profile-image{
+		max-height: 100px;
+		max-width: 100px;
+	}
+	.profile-image{
+		border-radius: 12px;
+	}
+</style>
+
+{% endblock %}
+
+{% block content %}
+<div class="users">
+
+
+<div class="container" >
+	<div class="card p-2" style="background-color: #242424;">
+
+		{% if accounts %}
+		<div class="d-flex flex-row flex-wrap">
+		{% for account in accounts %}
+		<div class="card flex-row flex-grow-1 p-2 mx-2 my-2 align-items-center">
+			<a class="profile-link" href="">
+				<div class="card-image m-2">
+					<img class="img-fluid profile-image" src="{% if account.0.user_image %} {{ account.0.user_image.url }} {% else %} {% static 'users/img/default_ava.jpg' %} {% endif %} " alt="">
+				</div>
+			</a>
+			<a class="profile-link" href="">
+				<div class="card-center px-2">
+					<h4 class="card-title">{{account.0.username}}</h4>
+					{% if account.1 %}
+					<a href="{% url 'messenger:create_chat' account.0.id %}" onclick="createOrReturnPrivateChat('{{account.0.id}}')"><button class="btn btn-warning">Send a Message</button></a>
+					{% endif %}
+
+				</div>
+			</a>
+			<div class="d-flex flex-row card-right flex-grow-1 justify-content-end mx-2">
+					{% if account.0 !=  request.user and not account.1 %}
+						<div class="d-flex flex-row friends-text-container p-3">
+							{% if not account.2 %}
+							<a href="{% url 'users:send_request' account.0.pk %}"><button class="btn btn-primary" >Send a friend request</button></a>
+							{% else %}
+							<a href="{% url 'users:accept_request' account.0.pk %}"><button class="btn btn-primary" >Accept a friend request</button></a>
+							{% endif %}
+						</div>
+					{% endif %}
+
+				{% if account.0 == request.user %}
+					<div class="d-flex flex-row friends-text-container p-3">
+						<p class="friends-text m-auto">
+							This is you
+						</p>
+					</div>
+				{% endif %}
+			</div>
+		</div>
+		{% if forloop.counter|divisibleby:2 %}
+		</div><div class="d-flex flex-row flex-wrap">
+		{% endif %}
+
+		{% endfor %}
+
+		{% else %} <!-- If no friends -->
+		<div class="d-flex flex-row flex-grow-1 justify-content-center align-items-center p-4">
+			<p>No results</p>
+		</div>
+		{% endif %}
+		</div>
+	</div>
+
+</div>
+
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'main/base.html' %}
+{% load static %}
+{% block content %}
+<div class="news">
+    {% for post in posts %}
+    <div class="last_news">
+        <div class="who_is_user">
+            <img src="{% if post.user.user_image %} {{ post.user.user_image.url }} {% else %} {% static 'users/img/default_ava.jpg' %} {% endif %} " alt="" style="border-radius: 50%; width: 10%; height: 10% ; text-align: left; margin-right: 3%;">
+            <a href="" style="text-decoration: none; color: white; margin-top: 3%;" ><h4 align="left" >@{{ post.user }} </h4></a>
+        </div>
+        <img src="{{ post.post_image }}" alt="" width="50%" height="50%" style="border-radius: 10%;" >
+        <div class="users_post">
+            <h4 style="color: #fcb045; margin-left: 3%; margin-right: 1.5%;" >@{{ post.user.username }}: </h4>
+            <h4 style="white-space: normal;" ><p><b> "{{ post.description }}"</b></p></h4>
+            </div>
+            <h6>{{ post.post_time }}</h6>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
